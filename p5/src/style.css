@@ -3,6 +3,10 @@
     src: url('assets/K26ToyBlocks123.ttf');
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -13,22 +17,30 @@ canvas {
 }
 
 main {
+    /* background-color: purple; */
     display: flex;
-    width: 100vw;
+    flex-direction: column;
     height: 100vh;
-    justify-content: center;
-    align-items: center;    
-}
-
-.main_box {
-    width: 50%;
-    background-color: rgba(27, 110, 235, 0.9);
-    border: 2px solid #fff;
+    padding: 1em;
 }
 
 .main_text {
+    /* background-color: red; */
+    margin: 0;
     font-family: 'K26ToyBlocks123';
     font-size: 5em;
     color: #fff;
     text-align: center;
+}
+
+#game_sketch_container {
+    margin: 0 auto;
+    margin-top: 2em;
+    width: 100%;
+    height: 70%;
+    /* background-color: rgba(255, 255, 0, 1); */
+}
+
+#game_sketch_container canvas {
+    margin: 0 auto;
 }
