@@ -1,0 +1,34 @@
+@font-face {
+    font-family: 'K26ToyBlocks123';
+    src: url('assets/K26ToyBlocks123.ttf');
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+canvas {
+    display: block;
+}
+
+main {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;    
+}
+
+.main_box {
+    width: 50%;
+    background-color: rgba(27, 110, 235, 0.9);
+    border: 2px solid #fff;
+}
+
+.main_text {
+    font-family: 'K26ToyBlocks123';
+    font-size: 5em;
+    color: #fff;
+    text-align: center;
+}
