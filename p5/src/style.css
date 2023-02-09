@@ -33,6 +33,13 @@ main {
     text-align: center;
 }
 
+@media(max-width: 768px){
+    .main_text{
+        font-size: 3em;
+        color: black;
+    }
+}
+
 #game_sketch_container {
     margin: 0 auto;
     margin-top: 2em;
@@ -42,5 +49,4 @@ main {
 
 #game_sketch_container canvas {
     margin: 0 auto;
-    background-color: rgba(0, 0, 0, 0.5);
 }

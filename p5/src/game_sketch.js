@@ -46,33 +46,62 @@ let game_sketch = (p) => {
       }
     }
     
-    p.shuffle_tiles(p.tiles);
+    // p.shuffle_tiles(p.tiles);
+  }
+
+  p.find_blank_tile = (tiles) => {
+    for(let i = 0; i < tiles.length; i++){
+      if(tiles[i].blank)
+        return i;
+    }
+  }
+
+  p.is_neighbor = (index1, index2) => {
+    let x1, y1, x2, y2;
+    x1 = (index1 / p.board_rows)|0;
+    x2 = (index2 / p.board_rows)|0;
+    y1 = index1 % p.board_cols;
+    y2 = index2 % p.board_cols;
+    if( x1 != x2 || y1 != y2){
+      dist = Math.abs(x1-x2) + Math.abs(y1-y2);
+      if( dist == 1 )
+        return true;
+    }
+    return false;
+  }
+
+  p.swap_tiles = (index1, index2, tiles) => {
+    let tmp = tiles[index1];
+    tiles[index1] = tiles[index2];
+    tiles[index2] = tmp;
+  }
+
+  p.mouseClicked = () => {
+    let row = (p.mouseY/p.tile_h)|0;
+    let col = (p.mouseX/p.tile_w)|0;
+    let index, blank_index;
+    if( (row >= 0 && col >= 0) && (row < p.board_rows && col < p.board_cols) ){
+      if(p.tiles.length == 0)
+        return;
+      index = col + row * p.board_cols;
+      blank_index = p.find_blank_tile(p.tiles);
+      if(p.is_neighbor(blank_index, index)){
+        p.swap_tiles(blank_index, index, p.tiles);
+      }
+    }
   }
 
   p.shuffle_tiles = (tiles) => {
-    let neighbors, x, y, blank_index, blank_x, blank_y, dist, neighbor_to_move, tmp;
+    let neighbors, blank_index, neighbor_to_move, tmp;
     for(let n = 0; n < 100; n++){
       neighbors = [];
+      blank_index = p.find_blank_tile(tiles);
       for(let i = 0; i < tiles.length; i++){
-        if(tiles[i].blank){
-          blank_index = i;
-          blank_x = (i / p.board_rows)|0;
-          blank_y = i % p.board_cols;
-        }
-      }
-      for(let i = 0; i < tiles.length; i++){
-        x = (i / p.board_rows)|0;
-        y = i % p.board_cols;
-        if( x != blank_x || y != blank_y){
-          dist = Math.abs(x-blank_x) + Math.abs(y-blank_y);
-          if( dist == 1 )
-            neighbors.push(i);
-        }
+        if(p.is_neighbor(blank_index, i))
+          neighbors.push(i);
       }
       neighbor_to_move = p.random(neighbors);
-      tmp = tiles[blank_index];
-      tiles[blank_index] = tiles[neighbor_to_move];
-      tiles[neighbor_to_move] = tmp;
+      p.swap_tiles(neighbor_to_move, blank_index, tiles);
     }
   }
 
@@ -83,10 +112,10 @@ let game_sketch = (p) => {
           let x = j * p.tile_w;
           let y = i * p.tile_h
           let index = j + i * p.board_cols;
-          p.image(tiles[index].img, x, y, p.tile_w, p.tile_h);
           p.strokeWeight(2);
           p.noFill();
           p.rect(x, y, p.tile_w, p.tile_h);
+          p.image(tiles[index].img, x, y, p.tile_w, p.tile_h);
         }
       }
     }
@@ -105,6 +134,7 @@ let game_sketch = (p) => {
   }
 
   p.draw = () => {
+    p.background('rgba(0, 0, 0, 0.01)');
     p.draw_image_tiles(p.tiles);
   }
 }
