@@ -9,25 +9,22 @@ let game_sketch = (p) => {
     let shorter_size = (width <= height ? width : height);
     return shorter_size;
   }
+
   p.windowResized = () => {
     p.game_sketch_container_size = p.get_shorter_size('game_sketch_container');
     p.resizeCanvas(p.game_sketch_container_size, p.game_sketch_container_size);
     p.tile_w = p.canvas.width/p.board_cols;
     p.tile_h = p.canvas.height/p.board_rows;
-    p.draw_image_tiles(p.tiles);
+    // p.draw_image_tiles(p.tiles);
   }
 
   p.get_image_url = new Promise( (resolve, reject) => {
-    if(localStorage.getItem("image_url") !== null){
-      resolve(localStorage.getItem("image_url"));
-    }
     p.animals = ["cats", "shibes"];
     p.which_animal = p.random(p.animals); 
     p.url = `https://shibe.online/api/${p.which_animal}?count=1&urls=true&httpsUrls=true`;
     fetch(p.url)
     .then(res => res.json())
     .then(data => {
-      localStorage.setItem("image_url", data[0]);
       resolve(data[0]);
     });
   });
@@ -38,22 +35,58 @@ let game_sketch = (p) => {
       for(let j = 0; j < p.board_cols; j++){
         let x = j * p.tile_w;
         let y = i * p.tile_h;
+        let index = j + i * p.board_cols;
         let img = p.createImage(p.tile_w, p.tile_h);
+        if(index == p.board_cols*p.board_rows-1){
+          p.tiles.push(new Tile(index, img, true));
+          continue;
+        }
         img.copy(source_img, x, y, p.tile_w, p.tile_h, 0, 0, p.tile_w, p.tile_h);
-        let tile = new Tile(j + i * p.board_cols, img);
-        p.tiles.push(tile);
+        p.tiles.push(new Tile(index, img));
       }
     }
-
     
+    p.shuffle_tiles(p.tiles);
+  }
+
+  p.shuffle_tiles = (tiles) => {
+    let neighbors, x, y, blank_index, blank_x, blank_y, dist, neighbor_to_move, tmp;
+    for(let n = 0; n < 100; n++){
+      neighbors = [];
+      for(let i = 0; i < tiles.length; i++){
+        if(tiles[i].blank){
+          blank_index = i;
+          blank_x = (i / p.board_rows)|0;
+          blank_y = i % p.board_cols;
+        }
+      }
+      for(let i = 0; i < tiles.length; i++){
+        x = (i / p.board_rows)|0;
+        y = i % p.board_cols;
+        if( x != blank_x || y != blank_y){
+          dist = Math.abs(x-blank_x) + Math.abs(y-blank_y);
+          if( dist == 1 )
+            neighbors.push(i);
+        }
+      }
+      neighbor_to_move = p.random(neighbors);
+      tmp = tiles[blank_index];
+      tiles[blank_index] = tiles[neighbor_to_move];
+      tiles[neighbor_to_move] = tmp;
+    }
   }
 
   p.draw_image_tiles = (tiles) => {
     if(tiles.length != 0){
       for(let i = 0; i < p.board_rows; i++){
         for(let j = 0; j < p.board_cols; j++){
+          let x = j * p.tile_w;
+          let y = i * p.tile_h
           let index = j + i * p.board_cols;
-          p.image(tiles[index].img, j * p.tile_w, i * p.tile_h, p.tile_w, p.tile_h);
+          p.image(tiles[index].img, x, y, p.tile_w, p.tile_h);
+          p.strokeWeight(2);
+          p.noFill();
+          p.rect(x, y, p.tile_w, p.tile_h);
         }
       }
     }

@@ -1,10 +1,7 @@
 class Tile {
-    constructor(original_index, img){
+    constructor(original_index, img, blank=false){
         this.original_index = original_index;
         this.img = img;
-    }
-
-    draw(){
-        console.log(this.original_index);
+        this.blank = blank;
     }
 }
