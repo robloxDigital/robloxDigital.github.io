@@ -7,6 +7,10 @@
     box-sizing: border-box;
 }
 
+p{
+    margin: 0;
+}
+
 body {
     padding: 0;
     margin: 0;
@@ -21,12 +25,14 @@ main {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 1em;
 }
 
+#banner {
+    padding: 1em;
+    background-color: rgba(0, 0, 0, 0.4);
+}
 .main_text {
     /* background-color: red; */
-    margin: 0;
     font-family: 'K26ToyBlocks123';
     font-size: 5em;
     color: #fff;
@@ -35,9 +41,14 @@ main {
 
 @media(max-width: 768px){
     .main_text{
-        font-size: 3em;
-        color: black;
+        font-size: 2.5em;
     }
+}
+
+#moves_made_text{
+    color: white;
+    font-size: 2em;
+    text-align: center;
 }
 
 #game_sketch_container {
@@ -48,5 +59,6 @@ main {
 }
 
 #game_sketch_container canvas {
+    box-shadow: 0px 0px 5px 1px;
     margin: 0 auto;
 }
