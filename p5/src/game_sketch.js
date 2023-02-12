@@ -1,10 +1,4 @@
 let game_sketch = (p) => {
-  p.board_rows = 4;
-  p.board_cols = 4;
-  p.tiles = [];
-  p.game_on = true;
-  p.moves_made = 0;
-
   p.get_shorter_size = (div_id) => {
     p.start_checking_if_solved = false;
     let width = document.getElementById(div_id).getBoundingClientRect().width;
@@ -48,7 +42,6 @@ let game_sketch = (p) => {
         p.tiles.push(new Tile(index, img));
       }
     }
-
     p.shuffle_tiles(p.tiles);
     p.start_checking_if_solved = true;
   }
@@ -81,25 +74,32 @@ let game_sketch = (p) => {
   }
 
   p.mouseClicked = () => {
-    let row = (p.mouseY / p.tile_h) | 0;
-    let col = (p.mouseX / p.tile_w) | 0;
-    let index, blank_index;
-    if ((row >= 0 && col >= 0) && (row < p.board_rows && col < p.board_cols)) {
-      if (p.tiles.length == 0)
-        return;
-      index = col + row * p.board_cols;
-      blank_index = p.find_blank_tile(p.tiles);
-      if (p.is_neighbor(blank_index, index)) {
-        p.swap_tiles(blank_index, index, p.tiles);
-        p.moves_made++;
-        document.getElementById("moves_made_text").innerText = `Moves made: ${p.moves_made}`;
+    if(p.game_on){
+      let row = (p.mouseY / p.tile_h) | 0;
+      let col = (p.mouseX / p.tile_w) | 0;
+      let index, blank_index;
+      if ((row >= 0 && col >= 0) && (row < p.board_rows && col < p.board_cols)) {
+        if (p.tiles.length == 0)
+          return;
+        index = col + row * p.board_cols;
+        blank_index = p.find_blank_tile(p.tiles);
+        if (p.is_neighbor(blank_index, index)) {
+          p.x_start = col * p.tile_w;
+          p.y_start = row * p.tile_h;
+          p.moves_x = 0;
+          p.moves_y = 0;
+          p.index_of_animated_tile = blank_index;
+          p.swap_tiles(blank_index, index, p.tiles);
+          p.moves_made++;
+          document.getElementById("moves_made_text").innerText = `Moves made: ${p.moves_made}`;
+        }
       }
     }
   }
 
   p.shuffle_tiles = (tiles) => {
-    let neighbors, blank_index, neighbor_to_move, tmp;
-    for (let n = 0; n < 5; n++) {
+    let neighbors, blank_index, neighbor_to_move;
+    for (let n = 0; n < 100; n++) {
       neighbors = [];
       blank_index = p.find_blank_tile(tiles);
       for (let i = 0; i < tiles.length; i++) {
@@ -113,6 +113,7 @@ let game_sketch = (p) => {
 
   p.draw_image_tiles = (tiles) => {
     if (tiles.length != 0) {
+      let blank_index = p.find_blank_tile(tiles);
       for (let i = 0; i < p.board_rows; i++) {
         for (let j = 0; j < p.board_cols; j++) {
           let x = j * p.tile_w;
@@ -121,6 +122,33 @@ let game_sketch = (p) => {
           p.strokeWeight(2);
           p.noFill();
           p.rect(x, y, p.tile_w, p.tile_h);
+          if(index == p.index_of_animated_tile){
+            let row = (index / p.board_cols)|0;
+            let col = index % p.board_cols;
+            let blank_row = (blank_index / p.board_cols)|0;
+            let blank_col = blank_index % p.board_cols;
+            let x_dist = col - blank_col;
+            let y_dist = row - blank_row;
+            if(x_dist != 0){
+              if(p.moves_x < p.moves_x_axis){
+                p.image(tiles[p.index_of_animated_tile].img, p.x_start, p.y_start, p.tile_w, p.tile_h);
+                p.x_start += x_dist*p.speed;
+                p.moves_x++;
+              }else{
+                p.index_of_animated_tile = -1;
+              }
+            }
+            if(y_dist != 0){
+              if(p.moves_y < p.moves_y_axis){
+                p.image(tiles[p.index_of_animated_tile].img, p.x_start, p.y_start, p.tile_w, p.tile_h);
+                p.y_start += y_dist*p.speed;
+                p.moves_y++;
+              }else{
+                p.index_of_animated_tile = -1;
+              }
+            }
+            continue;
+          }
           if (tiles[index].blank) {
             continue;
           }
@@ -143,9 +171,22 @@ let game_sketch = (p) => {
   p.setup = async () => {
     p.game_sketch_container_size = p.get_shorter_size('game_sketch_container');
     p.canvas = p.createCanvas(p.game_sketch_container_size, p.game_sketch_container_size);
+    p.board_rows = 4;
+    p.board_cols = 4;
     p.tile_w = p.canvas.width / p.board_cols;
     p.tile_h = p.canvas.height / p.board_rows;
     p.image_url = await p.get_image_url;
+    p.tiles = [];
+    p.game_on = true;
+    p.moves_made = 0;
+    p.index_of_animated_tile = -1;
+    p.speed = 15;
+    p.x_start = null;
+    p.y_start = null;
+    p.moves_x_axis = p.tile_w/p.speed;
+    p.moves_y_axis = p.tile_h/p.speed;
+    p.moves_x;
+    p.moves_y;
     // p.loadImage("https://images.dog.ceo/breeds/pomeranian/n02112018_4296.jpg", (image) => {
     p.loadImage(p.image_url, (image) => {
       p.create_image_tiles(image);
