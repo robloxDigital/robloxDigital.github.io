@@ -179,6 +179,7 @@ let game_sketch = (p) => {
     p.tiles = [];
     p.game_on = true;
     p.moves_made = 0;
+    p.seconds_passed = 0;
     p.index_of_animated_tile = -1;
     p.speed = 15;
     p.x_start = null;
@@ -188,24 +189,31 @@ let game_sketch = (p) => {
     p.moves_x;
     p.moves_y;
     // p.loadImage("https://images.dog.ceo/breeds/pomeranian/n02112018_4296.jpg", (image) => {
-    p.loadImage(p.image_url, (image) => {
-      p.create_image_tiles(image);
+      p.loadImage(p.image_url, (image) => {
+        p.create_image_tiles(image);
+        document.getElementById('defaultCanvas0').classList.add('canvas_appear');
     });
   }
 
   p.draw = () => {
-    if (p.game_on) {
+    if (p.game_on == true) {
       p.clear();
       p.draw_image_tiles(p.tiles);
+      if(p.index_of_animated_tile == -1){
         if (p.check_for_win(p.tiles)) {
+          p.draw_image_tiles(p.tiles);
           p.game_on = false;
           p.start_checking_if_solved = false;
           setTimeout(() => {
             alert("SOLVED");
           }, 50);
+        }
       }
     }
   }
 }
 
-let p5_game = new p5(game_sketch, 'game_sketch_container');
+document.getElementById('start_game_button').addEventListener('click', (event => {
+  event.target.classList.add('start_game_button_disappear');
+  let p5_game = new p5(game_sketch, 'game_sketch_container');
+}))

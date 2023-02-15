@@ -7,9 +7,7 @@
   <title>15 Puzzle Game</title>
   <link rel="stylesheet" href="style.css">
   <script src="../p5.min.js"></script>
-  <!-- <script src="../addons/p5.sound.js"></script> -->
   <script defer src="tile.js"></script>
-  <script defer src="background_sketch.js"></script>
   <script defer src="game_sketch.js"></script>
 </head>
 
@@ -17,7 +15,12 @@
   <main>
     <div id="banner">
       <p class="main_text">15 Puzzle Game</p>
-      <p id="moves_made_text">Moves made: 0</p>
+      <div id="results">
+        <p id="moves_made_text">Moves made: 0</p>
+        <p id="timer">Seconds passed: 0</p>
+      </div>
+    </div>
+    <button id="start_game_button">😎 Start game 😎</button>
     </div>
     <div id="game_sketch_container">
     </div>

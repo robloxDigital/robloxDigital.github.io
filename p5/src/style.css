@@ -7,6 +7,43 @@
     box-sizing: border-box;
 }
 
+#start_game_button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Comic Sans MS';
+    font-size: 2em;
+    padding: 1em;
+}
+
+@keyframes disappear {
+    from{
+        opacity: 1;
+    }
+    to{
+        opacity: 0;
+        display: none;
+    }
+}
+
+@keyframes appear {
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+
+.start_game_button_disappear{
+    animation: disappear 500ms forwards;
+}
+
+.canvas_appear{
+    animation: appear 2s forwards;
+}
+
 p{
     margin: 0;
 }
@@ -14,6 +51,7 @@ p{
 body {
     padding: 0;
     margin: 0;
+    background-color: #3d9eee;
 }
 
 canvas {
@@ -21,7 +59,6 @@ canvas {
 }
 
 main {
-    /* background-color: purple; */
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -32,7 +69,6 @@ main {
     background-color: rgba(0, 0, 0, 0.4);
 }
 .main_text {
-    /* background-color: red; */
     font-family: 'K26ToyBlocks123';
     font-size: 5em;
     color: #fff;
@@ -45,7 +81,15 @@ main {
     }
 }
 
-#moves_made_text{
+#results {
+    width: 50%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+}
+
+#moves_made_text, #timer{
+    font-family: 'Comic Sans MS';
     color: white;
     font-size: 2em;
     text-align: center;
@@ -59,6 +103,11 @@ main {
 }
 
 #game_sketch_container canvas {
+    margin: 0 auto;
+}
+
+.canvas_shadow{
     box-shadow: 0px 0px 5px 1px;
     margin: 0 auto;
+
 }
