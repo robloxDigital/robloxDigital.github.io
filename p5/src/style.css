@@ -110,7 +110,6 @@ main {
 @media(max-width: 768px){
     #banner{
         padding: 1em 0;
-        /* padding-top: 1em; */
     }
     #results{
         width: 100%;
