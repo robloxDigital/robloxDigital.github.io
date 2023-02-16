@@ -66,7 +66,6 @@ let game_sketch = (p) => {
     }
     return false;
   }
-
   p.swap_tiles = (index1, index2, tiles) => {
     let tmp = tiles[index1];
     tiles[index1] = tiles[index2];
@@ -91,7 +90,7 @@ let game_sketch = (p) => {
           p.index_of_animated_tile = blank_index;
           p.swap_tiles(blank_index, index, p.tiles);
           p.moves_made++;
-          document.getElementById("moves_made_text").innerText = `Moves made: ${p.moves_made}`;
+          moves_made_text.innerText = `Moves made: ${p.moves_made}`;
         }
       }
     }
@@ -177,9 +176,10 @@ let game_sketch = (p) => {
     p.tile_h = p.canvas.height / p.board_rows;
     p.image_url = await p.get_image_url;
     p.tiles = [];
-    p.game_on = true;
     p.moves_made = 0;
+    moves_made_text.innerText = `Moves made: ${p.moves_made}`;
     p.seconds_passed = 0;
+    timer.innerText = `Seconds passed: ${p.seconds_passed}`;
     p.index_of_animated_tile = -1;
     p.speed = 15;
     p.x_start = null;
@@ -188,10 +188,14 @@ let game_sketch = (p) => {
     p.moves_y_axis = p.tile_h/p.speed;
     p.moves_x;
     p.moves_y;
-    // p.loadImage("https://images.dog.ceo/breeds/pomeranian/n02112018_4296.jpg", (image) => {
-      p.loadImage(p.image_url, (image) => {
-        p.create_image_tiles(image);
-        document.getElementById('defaultCanvas0').classList.add('canvas_appear');
+    p.loadImage(p.image_url, (image) => {
+      p.create_image_tiles(image);
+      document.getElementById('defaultCanvas0').classList.add('canvas_appear');
+      p.game_on = true;
+      p.seconds_passed_interval = setInterval(() => {
+        timer.innerText = `Seconds passed: ${p.seconds_passed}`;
+        p.seconds_passed += 1;
+      }, 1000);
     });
   }
 
@@ -204,8 +208,11 @@ let game_sketch = (p) => {
           p.draw_image_tiles(p.tiles);
           p.game_on = false;
           p.start_checking_if_solved = false;
+          clearInterval(p.seconds_passed_interval);
           setTimeout(() => {
-            alert("SOLVED");
+            start_game_button.innerHTML = "😎 Congratz 😎 <br> Click to play again"
+            start_game_button.classList.remove('start_game_button_disappear');
+            start_game_button.classList.add('start_game_button_appear');
           }, 50);
         }
       }
@@ -213,7 +220,17 @@ let game_sketch = (p) => {
   }
 }
 
-document.getElementById('start_game_button').addEventListener('click', (event => {
+const start_game_button = document.getElementById('start_game_button');
+const game_sketch_container = document.getElementById('game_sketch_container');
+const moves_made_text = document.getElementById('moves_made_text');
+const timer = document.getElementById('timer');
+
+start_game_button.addEventListener('click', (event => {
+  event.target.classList.remove('start_game_button_appear');
   event.target.classList.add('start_game_button_disappear');
-  let p5_game = new p5(game_sketch, 'game_sketch_container');
+  let canvas = document.getElementById('defaultCanvas0');
+  if(canvas){
+    game_sketch_container.removeChild(canvas);
+  }
+  new p5(game_sketch, 'game_sketch_container');
 }))
