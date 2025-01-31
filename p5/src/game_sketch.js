@@ -18,11 +18,11 @@ let game_sketch = (p) => {
   p.get_image_url = new Promise((resolve, reject) => {
     p.animals = ["cats", "shibes"];
     p.which_animal = p.random(p.animals);
-    p.url = `https://shibe.online/api/${p.which_animal}?count=1&urls=true&httpsUrls=true`;
+    p.url = `https://random.dog/woof.json`;
     fetch(p.url)
       .then(res => res.json())
       .then(data => {
-        resolve(data[0]);
+        resolve(data.url);
       });
   });
 
