@@ -15,16 +15,29 @@ let game_sketch = (p) => {
     p.draw_image_tiles(p.tiles);
   }
 
-  p.get_image_url = new Promise((resolve, reject) => {
-    p.animals = ["cats", "shibes"];
-    p.which_animal = p.random(p.animals);
-    p.url = `https://random.dog/woof.json`;
-    fetch(p.url)
-      .then(res => res.json())
-      .then(data => {
-        resolve(data.url);
-      });
+  p.get_image_url = new Promise(async (resolve, reject) => {
+    try {
+      let isValidImage = false;
+      let fetchedUrl;
+  
+      while (!isValidImage) {
+        const response = await fetch('https://random.dog/woof.json');
+        const data = await response.json();
+  
+        fetchedUrl = data.url;
+  
+        if (fetchedUrl.match(/\.(jpg|jpeg|png)$/i)) {
+          isValidImage = true;
+          resolve(fetchedUrl);
+        } else {
+          console.warn(`Invalid file type returned: ${fetchedUrl}, retrying...`);
+        }
+      }
+    } catch (error) {
+      reject("Failed to fetch a valid image URL: " + error.message);
+    }
   });
+  
 
   p.create_image_tiles = (source_img) => {
     source_img.resize(p.game_sketch_container_size, p.game_sketch_container_size);
@@ -174,7 +187,6 @@ let game_sketch = (p) => {
     p.board_cols = 4;
     p.tile_w = p.canvas.width / p.board_cols;
     p.tile_h = p.canvas.height / p.board_rows;
-    p.image_url = await p.get_image_url;
     p.tiles = [];
     p.moves_made = 0;
     moves_made_text.innerText = `Moves made: ${p.moves_made}`;
@@ -184,20 +196,42 @@ let game_sketch = (p) => {
     p.speed = 15;
     p.x_start = null;
     p.y_start = null;
-    p.moves_x_axis = p.tile_w/p.speed;
-    p.moves_y_axis = p.tile_h/p.speed;
-    p.moves_x;
-    p.moves_y;
-    p.loadImage(p.image_url, (image) => {
-      p.create_image_tiles(image);
-      document.getElementById('defaultCanvas0').classList.add('canvas_appear');
-      p.game_on = true;
-      p.seconds_passed_interval = setInterval(() => {
-        timer.innerText = `Seconds passed: ${p.seconds_passed}`;
-        p.seconds_passed += 1;
-      }, 1000);
-    });
-  }
+    p.moves_x_axis = p.tile_w / p.speed;
+    p.moves_y_axis = p.tile_h / p.speed;
+  
+    // Helper function to introduce a delay
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  
+    // Function to load an image with a delay between retries
+    const loadImageUntilSuccess = async () => {
+      try {
+        p.image_url = await p.get_image_url; // Get new image URL
+        console.log(p.image_url)
+        console.log("Attempting to load image from URL:", p.image_url); // Debugging URL
+        p.loadImage(p.image_url, (image) => {
+          p.create_image_tiles(image);
+          document.getElementById('defaultCanvas0').classList.add('canvas_appear');
+          p.game_on = true;
+          console.log("Image loaded successfully");
+  
+          p.seconds_passed_interval = setInterval(() => {
+            timer.innerText = `Seconds passed: ${p.seconds_passed}`;
+            p.seconds_passed += 1;
+          }, 1000);
+        }, async (error) => {
+          console.error("Error loading image, retrying...");
+          await delay(1000); // Wait 1 second before retrying
+          loadImageUntilSuccess(); // Retry loading the image
+        });
+      } catch (error) {
+        console.error("Error fetching new image URL, retrying...");
+        await delay(1000); // Wait 1 second before retrying
+        loadImageUntilSuccess(); // Retry fetching the URL
+      }
+    };
+  
+    await loadImageUntilSuccess(); // Start loading image with retry logic
+  };
 
   p.draw = () => {
     if (p.game_on == true) {
@@ -212,8 +246,9 @@ let game_sketch = (p) => {
           setTimeout(() => {
             start_game_button.innerHTML = "😎 Congratz 😎 <br> Click to play again"
             start_game_button.classList.remove('start_game_button_disappear');
+            start_game_button.classList.add('shift_left');
             start_game_button.classList.add('start_game_button_appear');
-          }, 50);
+          }, 500);
         }
       }
     }
